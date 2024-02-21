@@ -1,31 +1,33 @@
-// Import required modules
 const express = require('express');
 const bodyParser = require('body-parser');
-const cors = require('cors'); // Add cors module
+const cors = require('cors');
 
-// Create an Express application
 const app = express();
+const PORT = process.env.PORT || 3000;
 
-// Use cors middleware to enable Cross-Origin Resource Sharing
 app.use(cors());
-
-// Use body-parser middleware to parse JSON and form data
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
 
-// Define a route for GET method
+let nodeMCUIP; // Variable to store the NodeMCU's IP dynamically
+
 app.get('/api/getExample', (req, res) => {
-    res.send('This is a GET request example');
+    console.log('Received GET request from NodeMCU');
+    res.json({ message: 'This is a GET request example', nodeMCUIP });
 });
 
-// Define a route for POST method
 app.post('/api/postExample', (req, res) => {
     const dataFromClient = req.body;
-    res.send(`Received data from client: ${JSON.stringify(dataFromClient)}`);
+    console.log('Received POST request from NodeMCU with data:', dataFromClient);
+    res.json({ receivedData: dataFromClient, nodeMCUIP });
 });
 
-// Set up the server to listen on port 3000
-const PORT = 3000;
+app.post('/api/registerNodeMCUIP', (req, res) => {
+    const { ip } = req.body;
+    nodeMCUIP = ip;
+    console.log('NodeMCU IP registered:', nodeMCUIP);
+    res.json({ success: true });
+});
+
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });
